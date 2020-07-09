@@ -40,7 +40,7 @@ void add(Number **list, int newNumber) {
 }
 
 Number last() {
-	return 
+	
 }
 
 Number first() {
@@ -96,13 +96,13 @@ char **split_str(char *in_str, const char in_delim) {
 	if (result)
 	{
 		size_t idx = 0;
-		char* token = strtok(in_str, delim);
+		char* token = strtok_s(in_str, delim, NULL);
 
 		while (token)
 		{
 			assert(idx < count);
 			*(result + idx++) = strdup(token);
-			token = strtok(0, delim);
+			token = strtok_s(0, delim, NULL);
 		}
 		assert(idx == count - 1);
 		*(result + idx) = 0;
@@ -128,10 +128,36 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 
-		char *command = split_str(&input, ' ');
-		char *parameter = split_str()
+		char *command = split_str(&input, ' ')[0];
+		char *parameter = split_str(&input, ' ')[1];
+
 		if (strcmp(command, "put") == 0) {
-			add
+			add(numberPtr, parameter);
+		}
+		else if (strcmp(command, "get") == 0) {
+			add(numberPtr, parameter);
+		}
+		else if (strcmp(command, "remove") == 0) {
+			remove(numberPtr, parameter);
+		}
+		else if (strcmp(command, "first") == 0) {
+			first(numberPtr, parameter);
+		}
+		else if (strcmp(command, "last") == 0) {
+			last(numberPtr, parameter);
+		}
+		else if (strcmp(command, "list") == 0) {
+			add(numberPtr, parameter);
+		}
+		else if (strcmp(command, "clear") == 0) {
+			add(numberPtr, parameter);
+		}
+		else if (strcmp(command, "help") == 0) {
+			printHelp();
+		}
+		else {
+			printf("Invalid command\nUsage:\n	command integer_value\n");
+			printHelp();
 		}
 
 		print_entry(input);
