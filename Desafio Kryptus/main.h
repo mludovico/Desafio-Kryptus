@@ -21,5 +21,5 @@ void printList(LinkedList* list);
 NodeStruct* get(LinkedList* list, int index);
 void removeItem(LinkedList* list, int index);
 void clear(LinkedList* list);
-NodeStruct* first(LinkedList* list);
-NodeStruct* last(LinkedList* list);
+void first(LinkedList* list);
+void last(LinkedList* list);

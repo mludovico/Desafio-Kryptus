@@ -32,6 +32,11 @@ void put(LinkedList* list, DataSctruct data) {
 }
 
 NodeStruct* get(LinkedList* list, int index) {
+	if (list->size == 0)
+	{
+		printf("Lista vazia\n");
+		return NULL;
+	}
 	NodeStruct* pointer = list->head;
 	int i = 1;
 	while(i < index)
@@ -49,6 +54,8 @@ NodeStruct* get(LinkedList* list, int index) {
 
 void removeItem(LinkedList* list, int index) {
 	NodeStruct* current = get(list, index);
+	if (current == NULL)
+		return;
 	NodeStruct* previous = get(list, index - 1);
 	if (current == NULL) return;
 	printf("Remover %d\n", current->data.value);
@@ -69,17 +76,24 @@ void clear(LinkedList* list) {
 	printList(list);
 }
 
-NodeStruct* first(LinkedList* list) {
+void first(LinkedList* list) {
 	NodeStruct* node = list->head;
-	printf("First value is %d\n", node->data.value);
+	if (node != NULL)
+		printf("First value is %d\n", node->data.value);
+	else
+		printf("Lista vazia\n");
 }
 
-NodeStruct* last(LinkedList* list) {
+void last(LinkedList* list) {
 	NodeStruct* node = list->head;
-	while(node->next != NULL){
-		node = node->next;
+	if (node != NULL) {
+		while (node->next != NULL) {
+			node = node->next;
+		}
+		printf("Last value is %d\n", node->data.value);
 	}
-	printf("Last value is %d\n", node->data.value);
+	else
+		printf("Lista vazia\n");
 }
 
 void printList(LinkedList* list) {
@@ -117,7 +131,7 @@ void print_entry(char *entry) {
 }
 
 void printHelp() {
-	printf("Usage:	command integer_value\nCommands:\n");
+	printf("Usage:	command integer_value\nCommands:\n\n");
 	printf("put:	insert new value to the list\n");
 	printf("get:	get value from the specified index of list\n");
 	printf("list:	print all items from the list\n");
@@ -126,7 +140,7 @@ void printHelp() {
 	printf("first:	get the first value from the list and print it's value\n");
 	printf("last:	get the last value from the list and print it's value\n");
 	printf("exit:	exit to system\n");
-	printf("help:	print this info\n");
+	printf("help:	print this info\n\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -134,21 +148,6 @@ int main(int argc, char *argv[]) {
 
 	LinkedList *list = createList();
 	DataSctruct data;
-	//data.value = 5;
-	//put(list, data);
-	//data.value = 9;
-	//put(list, data);
-	//data.value = 7;
-	//put(list, data);
-	//data.value = 2;
-	//put(list, data);
-	//get(list, 1);
-	//get(list, 3);
-	//get(list, 10);
-	//first(list);
-	//last(list);
-	//removeItem(list, 2);
-	//clear(list);
 
 	while (1) {
 		printf("prompt> ");
@@ -166,7 +165,10 @@ int main(int argc, char *argv[]) {
 			parameterValue = 0;
 		
 
-		if (strncmp(input, "exit\n", 5) == 0) {
+		if (strncmp(input, "\n", 1) == 0) {
+			continue;
+		}
+		else if (strncmp(input, "exit\n", 5) == 0) {
 			printf("Leaving. Good bye.\n");
 			break;
 		}
@@ -186,21 +188,20 @@ int main(int argc, char *argv[]) {
 			printHelp();
 		}
 		else if (strcmp(command, "put", 3) == 0 && parameterValue != 0) {
-			data.value = parameter;
+			data.value = parameterValue;
 			put(list, data);
 		}
 		else if (strcmp(command, "get", 3) == 0 && parameterValue != 0) {
-			get(list, command);
+			get(list, parameterValue);
 		}
 		else if (strcmp(command, "remove", 6) == 0 && parameterValue != 0) {
-			removeItem(list, command);
+			removeItem(list, parameterValue);
 		}
 		else {
-			printf("Invalid command\n");
+			printf("Invalid command\n\n");
 			printHelp();
 		}
 	}
 
-	getchar();
 	return EXIT_SUCCESS;
 }
