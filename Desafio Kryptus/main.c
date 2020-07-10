@@ -11,40 +11,105 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "main.h"
 
-typedef struct Number_Struct
-{
-	int number;
-	struct Number_Struct *next;
-}Number;
 
-void add(Number **list, int newNumber) {
-	Number *new_number;
-	new_number = (Number *)malloc(sizeof(Number));
-	if (new_number == NULL) exit(0);
-	new_number->number = newNumber;
-	new_number->next = NULL;
+LinkedList* createList() {
+	LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
+	list->size = 0;
+	list->head = NULL;
+	list->tail = NULL;
+	return list;
+}
 
-	if (*list == NULL) {
-		*list = new_number;
-	}
-	else {
-		Number *aux;
-		aux = *list;
-		while (aux->next != NULL) {
-			aux = aux->next;
+void put(LinkedList* list, DataSctruct data) {
+	NodeStruct* node = (NodeStruct*) malloc(sizeof(NodeStruct));
+	node->data = data;
+	node->next = list->head;
+	list->head = node;
+	list->size++;
+	printList(list);
+}
+
+NodeStruct* get(LinkedList* list, int index) {
+	NodeStruct* pointer = list->head;
+	int i = 1;
+	while(i < index)
+	{
+		if (pointer->next == NULL) {
+			printf("Valor não encontrado\n");
+			return NULL;
 		}
-		aux->next = new_number;
-		*list = aux;
+		pointer = pointer->next;
+		i++;
 	}
+	printf("%d\n", pointer->data.value);
+	return pointer;
 }
 
-Number last() {
-	
+void removeItem(LinkedList* list, int index) {
+	NodeStruct* current = get(list, index);
+	NodeStruct* previous = get(list, index - 1);
+	if (current == NULL) return;
+	printf("Remover %d\n", current->data.value);
+	previous->next = current->next;
+	free(current);
+	list->size--;
+	printList(list);
 }
 
-Number first() {
+void clear(LinkedList* list) {
+	NodeStruct* pointer = list->head;
+	while (pointer != NULL) {
+		NodeStruct* next = pointer->next;
+		free(pointer);
+		pointer = next;
+		list->size--;
+	}
+	printList(list);
+}
 
+NodeStruct* first(LinkedList* list) {
+	NodeStruct* node = list->head;
+	printf("First value is %d\n", node->data.value);
+}
+
+NodeStruct* last(LinkedList* list) {
+	NodeStruct* node = list->head;
+	while(node->next != NULL){
+		node = node->next;
+	}
+	printf("Last value is %d\n", node->data.value);
+}
+
+void printList(LinkedList* list) {
+
+	if (list->size == 0) {
+		printf("Lista vazia\n");
+		return;
+	}
+
+	NodeStruct* pointer = list->head;
+	while (pointer != NULL)
+	{
+		printf("%d ", pointer->data.value);
+		pointer = pointer->next;
+	}
+	printf("\n");
+}
+
+char* getCommand(char* entry) {
+#pragma warning(suppress : 4996)
+	char* token = strtok(entry, " ");
+	//printf("%s", token);
+	return token;
+}
+
+char* getParameter(char* entry) {
+#pragma warning(suppress : 4996)
+	char* token = strtok(NULL, "\n");
+	//printf("%s", token);
+	return token;
 }
 
 void print_entry(char *entry) {
@@ -52,7 +117,7 @@ void print_entry(char *entry) {
 }
 
 void printHelp() {
-	printf("Commands:\n");
+	printf("Usage:	command integer_value\nCommands:\n");
 	printf("put:	insert new value to the list\n");
 	printf("get:	get value from the specified index of list\n");
 	printf("list:	print all items from the list\n");
@@ -64,57 +129,26 @@ void printHelp() {
 	printf("help:	print this info\n");
 }
 
-char **split_str(char *in_str, const char in_delim) {
-	char** result = 0;
-	size_t count = 0;
-	char* tmp = in_str;
-	char* last_space = 0;
-	char delim[2];
-	delim[0] = in_delim;
-	delim[1] = 0;
-
-	/* Count how many elements will be extracted. */
-	while (*tmp)
-	{
-		if (in_delim == *tmp)
-		{
-			count++;
-			last_space = tmp;
-		}
-		tmp++;
-	}
-
-	/* Add space for trailing token. */
-	count += last_space < (in_str + strlen(in_str) - 1);
-
-	/* Add space for terminating null string so caller
-	   knows where the list of returned strings ends. */
-	count++;
-
-	result = malloc(sizeof(char*) * count);
-
-	if (result)
-	{
-		size_t idx = 0;
-		char* token = strtok_s(in_str, delim, NULL);
-
-		while (token)
-		{
-			assert(idx < count);
-			*(result + idx++) = strdup(token);
-			token = strtok_s(0, delim, NULL);
-		}
-		assert(idx == count - 1);
-		*(result + idx) = 0;
-	}
-
-	return result;
-}
-
 int main(int argc, char *argv[]) {
 	char input[201];
 
-	Number *numberPtr;
+	LinkedList *list = createList();
+	DataSctruct data;
+	//data.value = 5;
+	//put(list, data);
+	//data.value = 9;
+	//put(list, data);
+	//data.value = 7;
+	//put(list, data);
+	//data.value = 2;
+	//put(list, data);
+	//get(list, 1);
+	//get(list, 3);
+	//get(list, 10);
+	//first(list);
+	//last(list);
+	//removeItem(list, 2);
+	//clear(list);
 
 	while (1) {
 		printf("prompt> ");
@@ -123,45 +157,50 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 
+		char* command = getCommand(input);
+		char* parameter = getParameter(input);
+		int parameterValue;
+		if (parameter != NULL)
+			parameterValue = atoi(parameter);
+		else
+			parameterValue = 0;
+		
+
 		if (strncmp(input, "exit\n", 5) == 0) {
 			printf("Leaving. Good bye.\n");
 			break;
 		}
-
-		char *command = split_str(&input, ' ')[0];
-		char *parameter = split_str(&input, ' ')[1];
-
-		if (strcmp(command, "put") == 0) {
-			add(numberPtr, parameter);
+		else if (strcmp(input, "first\n", 6) == 0) {
+			first(list);
 		}
-		else if (strcmp(command, "get") == 0) {
-			add(numberPtr, parameter);
+		else if (strcmp(input, "last\n", 5) == 0) {
+			last(list);
 		}
-		else if (strcmp(command, "remove") == 0) {
-			remove(numberPtr, parameter);
+		else if (strcmp(input, "list\n", 5) == 0) {
+			printList(list);
 		}
-		else if (strcmp(command, "first") == 0) {
-			first(numberPtr, parameter);
+		else if (strcmp(input, "clear\n", 6) == 0) {
+			clear(list);
 		}
-		else if (strcmp(command, "last") == 0) {
-			last(numberPtr, parameter);
-		}
-		else if (strcmp(command, "list") == 0) {
-			add(numberPtr, parameter);
-		}
-		else if (strcmp(command, "clear") == 0) {
-			add(numberPtr, parameter);
-		}
-		else if (strcmp(command, "help") == 0) {
+		else if (strcmp(input, "help\n", 5) == 0) {
 			printHelp();
+		}
+		else if (strcmp(command, "put", 3) == 0 && parameterValue != 0) {
+			data.value = parameter;
+			put(list, data);
+		}
+		else if (strcmp(command, "get", 3) == 0 && parameterValue != 0) {
+			get(list, command);
+		}
+		else if (strcmp(command, "remove", 6) == 0 && parameterValue != 0) {
+			removeItem(list, command);
 		}
 		else {
-			printf("Invalid command\nUsage:\n	command integer_value\n");
+			printf("Invalid command\n");
 			printHelp();
 		}
-
-		print_entry(input);
 	}
 
+	getchar();
 	return EXIT_SUCCESS;
 }
