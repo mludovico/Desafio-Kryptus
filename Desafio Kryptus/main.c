@@ -11,6 +11,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#if _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif // _WIN32
+
 #include "main.h"
 
 
@@ -25,8 +32,15 @@ LinkedList* createList() {
 void put(LinkedList* list, DataSctruct data) {
 	NodeStruct* node = (NodeStruct*) malloc(sizeof(NodeStruct));
 	node->data = data;
-	node->next = list->head;
-	list->head = node;
+	node->next = NULL;
+	if (list->size == 0)
+		list->head = node;
+	else
+	{
+		NodeStruct* lastNode = last(list, false);
+		lastNode->next = node;
+
+	}
 	list->size++;
 	printList(list);
 }
@@ -58,7 +72,6 @@ void removeItem(LinkedList* list, int index) {
 		return;
 	NodeStruct* previous = get(list, index - 1);
 	if (current == NULL) return;
-	printf("Remover %d\n", current->data.value);
 	previous->next = current->next;
 	free(current);
 	list->size--;
@@ -66,34 +79,40 @@ void removeItem(LinkedList* list, int index) {
 }
 
 void clear(LinkedList* list) {
-	NodeStruct* pointer = list->head;
-	while (pointer != NULL) {
-		NodeStruct* next = pointer->next;
-		free(pointer);
-		pointer = next;
-		list->size--;
+	if (list->size != 0) {
+		NodeStruct* pointer = list->head;
+		while (pointer->next != NULL) {
+			NodeStruct* next = pointer->next;
+			free(pointer);
+			pointer = next;
+		}
+		list->head = NULL;
+		list->size = 0;
 	}
 	printList(list);
 }
 
-void first(LinkedList* list) {
+NodeStruct* first(LinkedList* list, bool print) {
 	NodeStruct* node = list->head;
-	if (node != NULL)
-		printf("First value is %d\n", node->data.value);
+	if (node != NULL && print)
+		printf("%d\n", node->data.value);
 	else
 		printf("Lista vazia\n");
+	return node;
 }
 
-void last(LinkedList* list) {
+NodeStruct* last(LinkedList* list, bool print) {
 	NodeStruct* node = list->head;
 	if (node != NULL) {
 		while (node->next != NULL) {
 			node = node->next;
 		}
-		printf("Last value is %d\n", node->data.value);
+		if(print)
+			printf("%d\n", node->data.value);
 	}
 	else
 		printf("Lista vazia\n");
+	return node;
 }
 
 void printList(LinkedList* list) {
@@ -173,10 +192,10 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		else if (strcmp(input, "first\n", 6) == 0) {
-			first(list);
+			first(list, true);
 		}
 		else if (strcmp(input, "last\n", 5) == 0) {
-			last(list);
+			last(list, true);
 		}
 		else if (strcmp(input, "list\n", 5) == 0) {
 			printList(list);
@@ -202,6 +221,11 @@ int main(int argc, char *argv[]) {
 			printHelp();
 		}
 	}
+#ifdef _WIN32
+	Sleep(1000);
+#else
+	sleep(1);
+#endif // _WIN32
 
 	return EXIT_SUCCESS;
 }
